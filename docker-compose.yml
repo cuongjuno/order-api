@@ -1,27 +1,30 @@
-version: "3.8"
+version: '3.8'
 services:
-  api:
-      # image: thomas-oliver/nestjs-dockerized 
-      build:
-          dockerfile: Dockerfile
-          context: .
-      depends_on: 
-          - postgres
-      environment: 
-          DATABASE_URL: postgres://user:password@postgres:5432/db
-          NODE_ENV: development
-          PORT: 3006
-      ports:
-          - "8080:3006"
+  # api:
+  #   # image: thomas-oliver/nestjs-dockerized
+  #   build:
+  #     dockerfile: Dockerfile
+  #     context: .
+  #   command: yarn run start:dev
+  #   depends_on:
+  #     - postgres
+  #   environment:
+  #     DATABASE_URL: postgres://user:password@postgres:5432/db
+  #     NODE_ENV: development
+  #     PORT: 3006
+  #   ports:
+  #     - '8080:3006'
+  #   volumes:
+  #     - .:/app
 
   postgres:
-      image: postgres:10.4
-      ports:
-          - "35000:5432"
-      environment: 
-          POSTGRES_USER: user
-          POSTGRES_PASSWORD: password
-          POSTGRES_DB: db
+    image: postgres:10.4
+    ports:
+      - '35000:5432'
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: db
 
   pgadmin:
     container_name: pgadmin4_container
@@ -31,4 +34,4 @@ services:
       PGADMIN_DEFAULT_EMAIL: admin@admin.com
       PGADMIN_DEFAULT_PASSWORD: root
     ports:
-      - "5050:80"
+      - '5050:80'
