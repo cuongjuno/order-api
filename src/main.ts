@@ -16,10 +16,10 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
   app.useGlobalPipes(new ValidationPipe());
-  app.use(cookieParser('app secrect'));
+  app.use(cookieParser(process.env.APP_SECRET));
   app.use(
     session({
-      secret: 'app secrect' as string,
+      secret: process.env.APP_SECRET as string,
       resave: false,
       saveUninitialized: false,
       store: new session.MemoryStore(),
@@ -33,6 +33,12 @@ async function bootstrap() {
 
   app.use(passport.initialize());
   app.use(passport.session());
+  app.enableCors({
+    origin: process.env.ALLOWED_ORIGINS?.split(/\s*,\s*/) ?? '*',
+    credentials: true,
+    exposedHeaders: ['Authorization'],
+  });
+
   await app.listen(3006);
 }
 bootstrap();
