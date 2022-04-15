@@ -13,7 +13,7 @@ export class CreateUserDto {
   @IsDefined()
   @IsNotEmpty()
   @IsEmail()
-  // @Validate(IsUserAlreadyExist)
+  @Validate(IsUserAlreadyExist)
   readonly email: string;
 
   @ApiProperty()
