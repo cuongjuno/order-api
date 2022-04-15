@@ -8,7 +8,6 @@ export class LocalAuthGuard extends AuthGuard('local') {
 
     if (context.getType() === 'http') {
       const request = context.switchToHttp().getRequest();
-
       await super.logIn(request);
     }
 

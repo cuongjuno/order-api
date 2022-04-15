@@ -1,32 +1,38 @@
-import {
-  HttpException,
-  HttpStatus,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { SendEmailService } from 'src/send-email/send-email.service';
 import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
-import { hashSync } from 'bcrypt';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User)
     private usersRepository: Repository<User>,
+    private sendEmailService: SendEmailService,
   ) {}
 
-  async create(createUserDto: CreateUserDto) {
+  async create(createUserDto: CreateUserDto): Promise<User | string> {
     const { password, email, full_name } = createUserDto;
-    const user: User = await this.usersRepository.create({
-      password,
-      email,
-      full_name,
-    });
-    await this.usersRepository.save(user);
-    return user;
+    const response = await this.sendEmailService
+      .sendEmail({
+        to: [email],
+        subject: 'Register successful',
+        content: `Register successful!`,
+      })
+      .then(async () => {
+        const user: User = await this.usersRepository.create({
+          password,
+          email,
+          full_name,
+        });
+        await this.usersRepository.save(user);
+        return user;
+      })
+      .catch((e) => e);
+    return response;
   }
 
   findAll(): Promise<User[]> {

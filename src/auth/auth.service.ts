@@ -1,11 +1,9 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-
-import { JwtPayload } from './interfaces/jwt-payload.interface';
+import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import { User } from 'src/users/entities/user.entity';
 import { UsersService } from 'src/users/users.service';
-import { CreateUserDto } from 'src/users/dto/create-user.dto';
-import { LogInDto } from './dto/log-in.dto';
+import { JwtPayload } from './interfaces/jwt-payload.interface';
 
 @Injectable()
 export class AuthService {
@@ -14,15 +12,15 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  async register(signUp: CreateUserDto): Promise<User> {
-    const user = await this.userService.create(signUp);
-    delete user.password;
+  async register(createUserDto: CreateUserDto): Promise<User | string> {
+    const response = await this.userService.create(createUserDto);
+    if (typeof response !== 'string') delete response.password;
 
-    return user;
+    return response;
   }
 
-  async login({ email, password }: LogInDto): Promise<User> {
-    let user: User;
+  async login(email: string, password: string): Promise<any> {
+    let user: any;
 
     try {
       user = await this.userService.findUser(email);
@@ -39,6 +37,8 @@ export class AuthService {
     }
     delete user.password;
 
+    user.access_token = this.signToken(user);
+
     return user;
   }
 
@@ -46,8 +46,7 @@ export class AuthService {
     let user: User;
 
     try {
-      const email = payload.sub;
-      user = await this.userService.findUser(email);
+      user = await this.userService.findUser(payload.sub);
     } catch (error) {
       throw new UnauthorizedException(
         `There isn't any user with email: ${payload.sub}`,

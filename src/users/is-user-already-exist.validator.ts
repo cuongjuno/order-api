@@ -17,9 +17,7 @@ export class IsUserAlreadyExist implements ValidatorConstraintInterface {
   ) {}
 
   async validate(email: string): Promise<boolean> {
-    console.log('email', this.userRepository);
-
-    const user = await this.userRepository.findOne({ where: { email: 'ok' } });
+    const user = await this.userRepository.findOneBy({ email });
 
     return isNullOrUndefined(user);
   }
