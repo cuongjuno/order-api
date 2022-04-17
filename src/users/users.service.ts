@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { SendEmailService } from 'src/send-email/send-email.service';
+import { MailService } from 'src/mail/mail.service';
 import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -11,28 +11,20 @@ export class UsersService {
   constructor(
     @InjectRepository(User)
     private usersRepository: Repository<User>,
-    private sendEmailService: SendEmailService,
+    private mailService: MailService,
   ) {}
 
   async create(createUserDto: CreateUserDto): Promise<User | string> {
     const { password, email, full_name } = createUserDto;
-    const response = await this.sendEmailService
-      .sendEmail({
-        to: [email],
-        subject: 'Register successful',
-        content: `Register successful!`,
-      })
-      .then(async () => {
-        const user: User = await this.usersRepository.create({
-          password,
-          email,
-          full_name,
-        });
-        await this.usersRepository.save(user);
-        return user;
-      })
-      .catch((e) => e);
-    return response;
+    const token = Math.floor(1000 + Math.random() * 9000).toString();
+    const user: User = await this.usersRepository.create({
+      password,
+      email,
+      full_name,
+    });
+    await this.usersRepository.save(user);
+    await this.mailService.sendUserConfirmation(user, token);
+    return user;
   }
 
   findAll(): Promise<User[]> {
