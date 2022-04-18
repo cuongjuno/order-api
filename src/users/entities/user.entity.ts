@@ -8,10 +8,14 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import * as bcrypt from 'bcryptjs';
-import { Exclude } from 'class-transformer';
+import { classToPlain, Exclude } from 'class-transformer';
 
 @Entity()
 export class User {
+  constructor(data: Partial<User> = {}) {
+    Object.assign(this, data);
+  }
+
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -22,8 +26,14 @@ export class User {
   email: string;
 
   @Column()
-  @Exclude()
+  @Exclude({ toPlainOnly: true })
   password: string;
+
+  @Column({ default: false })
+  is_active: boolean;
+
+  @Column({ default: false })
+  receive_ads: boolean;
 
   @CreateDateColumn()
   createdAt: Date;
@@ -31,8 +41,8 @@ export class User {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  constructor(data: Partial<User> = {}) {
-    Object.assign(this, data);
+  toJSON() {
+    return classToPlain(this);
   }
 
   @BeforeInsert()

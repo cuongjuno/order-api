@@ -20,26 +20,22 @@ export class AuthService {
   }
 
   async login(email: string, password: string): Promise<any> {
-    let user: any;
-
-    try {
-      user = await this.userService.findUser(email);
-    } catch (err) {
+    const user = await this.userService.findUser(email);
+    if (!user) {
       throw new UnauthorizedException(
         `There isn't any user with email: ${email}`,
       );
-    }
-
-    if (!(await user.checkPassword(password))) {
+    } else if (!(await user.checkPassword(password))) {
       throw new UnauthorizedException(
         `Wrong password for user with email: ${email}`,
       );
     }
+
     delete user.password;
 
-    user.access_token = this.signToken(user);
+    const access_token = this.signToken(user);
 
-    return user;
+    return { ...user, access_token };
   }
 
   async verifyPayload(payload: JwtPayload): Promise<User> {

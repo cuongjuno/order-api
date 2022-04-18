@@ -15,12 +15,13 @@ export class UsersService {
   ) {}
 
   async create(createUserDto: CreateUserDto): Promise<User | string> {
-    const { password, email, full_name } = createUserDto;
+    const { password, email, full_name, receive_ads } = createUserDto;
     const token = Math.floor(1000 + Math.random() * 9000).toString();
     const user: User = await this.usersRepository.create({
       password,
       email,
       full_name,
+      receive_ads,
     });
     await this.usersRepository.save(user);
     await this.mailService.sendUserConfirmation(user, token);

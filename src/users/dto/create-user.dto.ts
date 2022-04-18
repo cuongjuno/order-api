@@ -9,7 +9,7 @@ import {
 import { IsUserAlreadyExist } from '../is-user-already-exist.validator';
 
 export class CreateUserDto {
-  @ApiProperty({ required: false })
+  @ApiProperty()
   @IsDefined()
   @IsNotEmpty()
   @IsEmail()
@@ -19,11 +19,15 @@ export class CreateUserDto {
   @ApiProperty()
   @IsDefined()
   @IsNotEmpty()
-  @MinLength(8)
+  // @MinLength(8)
   password: string;
 
   @ApiProperty()
   @IsDefined()
   @IsNotEmpty()
   full_name: string;
+
+  @ApiProperty({ required: false, default: false })
+  @IsDefined()
+  receive_ads: boolean;
 }
