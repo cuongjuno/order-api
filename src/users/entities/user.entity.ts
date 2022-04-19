@@ -9,6 +9,7 @@ import {
 } from 'typeorm';
 import * as bcrypt from 'bcryptjs';
 import { classToPlain, Exclude } from 'class-transformer';
+import { Role } from '../enum/role.enum';
 
 @Entity()
 export class User {
@@ -34,6 +35,9 @@ export class User {
 
   @Column({ default: false })
   receive_ads: boolean;
+
+  @Column({ type: 'enum', enum: Role, default: Role.USER })
+  role: Role;
 
   @CreateDateColumn()
   createdAt: Date;
