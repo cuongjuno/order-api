@@ -1,26 +1,54 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { CreateStaffDto } from './dto/create-staff.dto';
 import { UpdateStaffDto } from './dto/update-staff.dto';
+import { Staff } from './entities/staff.entity';
 
 @Injectable()
 export class StaffsService {
-  create(createStaffDto: CreateStaffDto) {
-    return 'This action adds a new staff';
+  constructor(
+    @InjectRepository(Staff)
+    private staffsRepository: Repository<Staff>,
+  ) {}
+  async create(createStaffDto: CreateStaffDto): Promise<Staff> {
+    const { password, email, full_name } = createStaffDto;
+    const staff: Staff = await this.staffsRepository.create({
+      password,
+      email,
+      full_name,
+    });
+    await this.staffsRepository.save(staff);
+    return staff;
   }
 
-  findAll() {
-    return `This action returns all staffs`;
+  findAll(): Promise<Staff[]> {
+    return this.staffsRepository.find();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} staff`;
+  findOne(id: number): Promise<Staff> {
+    return this.staffsRepository.findOne({ where: { id } });
   }
 
-  update(id: number, updateStaffDto: UpdateStaffDto) {
-    return `This action updates a #${id} staff`;
+  findStaff(email: string): Promise<Staff> {
+    return this.staffsRepository.findOne({
+      where: {
+        email,
+      },
+    });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} staff`;
+  async update(id: number, updateStaffDto: UpdateStaffDto) {
+    const user = await this.staffsRepository.findOne({ where: { id } });
+
+    if (!user) {
+      throw new NotFoundException(`There isn't any user with id: ${id}`);
+    }
+    Object.assign(user, updateStaffDto);
+
+    return this.staffsRepository.save(user);
+  }
+  async remove(id: number): Promise<void> {
+    await this.staffsRepository.delete(id);
   }
 }

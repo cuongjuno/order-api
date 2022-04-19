@@ -17,6 +17,8 @@ export class IsStaffAlreadyExist implements ValidatorConstraintInterface {
   ) {}
 
   async validate(email: string): Promise<boolean> {
+    console.log('email', email);
+
     const staff = await this.staffRepository.findOneBy({ email });
 
     return isNullOrUndefined(staff);

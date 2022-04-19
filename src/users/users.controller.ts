@@ -46,6 +46,6 @@ export class UsersController {
   @Delete(':id')
   @UseGuards(JWTAuthGuard)
   remove(@Param('id') id: number) {
-    return this.usersService.remove(String(id));
+    return this.usersService.remove(id);
   }
 }

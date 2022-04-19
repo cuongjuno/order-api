@@ -44,4 +44,26 @@ export class AuthController {
   me(@AuthUser() user: User): User {
     return user;
   }
+
+  @Post('staff/register')
+  @HttpCode(HttpStatus.CREATED)
+  registerStaff(@Body() createUserDto: CreateUserDto): Promise<User | string> {
+    return this.authService.register(createUserDto);
+  }
+
+  @Post('staff/login')
+  @ApiBody({
+    type: LogInDto,
+  })
+  @UseGuards(LocalAuthGuard)
+  @HttpCode(HttpStatus.OK)
+  async loginStaff(@AuthUser() user: User): Promise<User> {
+    return user;
+  }
+
+  @Get('staff/me')
+  @UseGuards(JWTAuthGuard)
+  meStaff(@AuthUser() user: User): User {
+    return user;
+  }
 }
