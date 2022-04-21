@@ -9,5 +9,6 @@ import { IsStaffAlreadyExist } from './is-staff-already-exist.validator';
   imports: [TypeOrmModule.forFeature([Staff])],
   controllers: [StaffsController],
   providers: [StaffsService, IsStaffAlreadyExist],
+  exports: [StaffsService],
 })
 export class StaffsModule {}

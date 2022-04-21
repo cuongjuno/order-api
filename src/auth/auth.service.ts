@@ -1,5 +1,8 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { CreateStaffDto } from 'src/staffs/dto/create-staff.dto';
+import { Staff } from 'src/staffs/entities/staff.entity';
+import { StaffsService } from 'src/staffs/staffs.service';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import { User } from 'src/users/entities/user.entity';
 import { UsersService } from 'src/users/users.service';
@@ -9,11 +12,19 @@ import { JwtPayload } from './interfaces/jwt-payload.interface';
 export class AuthService {
   constructor(
     private readonly userService: UsersService,
+    private readonly staffsService: StaffsService,
     private readonly jwtService: JwtService,
   ) {}
 
   async register(createUserDto: CreateUserDto): Promise<User | string> {
     const response = await this.userService.create(createUserDto);
+    if (typeof response !== 'string') delete response.password;
+
+    return response;
+  }
+
+  async registerStaff(createStaffDto: CreateStaffDto): Promise<Staff | string> {
+    const response = await this.staffsService.create(createStaffDto);
     if (typeof response !== 'string') delete response.password;
 
     return response;

@@ -8,6 +8,8 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiBody, ApiTags } from '@nestjs/swagger';
+import { CreateStaffDto } from 'src/staffs/dto/create-staff.dto';
+import { Staff } from 'src/staffs/entities/staff.entity';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import { User } from 'src/users/entities/user.entity';
 import { AuthUser } from 'src/users/user.decorator';
@@ -47,8 +49,10 @@ export class AuthController {
 
   @Post('staff/register')
   @HttpCode(HttpStatus.CREATED)
-  registerStaff(@Body() createUserDto: CreateUserDto): Promise<User | string> {
-    return this.authService.register(createUserDto);
+  registerStaff(
+    @Body() createStaffDto: CreateStaffDto,
+  ): Promise<Staff | string> {
+    return this.authService.registerStaff(createStaffDto);
   }
 
   @Post('staff/login')
